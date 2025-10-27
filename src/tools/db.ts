@@ -1,8 +1,15 @@
 import { Pool } from "pg";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+let pool: Pool | null = null;
+
+function getPool() {
+  if (!pool && process.env.DATABASE_URL) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+    });
+  }
+  return pool;
+}
 
 export interface DbQueryParams {
   sql: string;
@@ -24,6 +31,18 @@ export const dbQueryTool = {
       };
     }
 
+    const dbPool = getPool();
+    if (!dbPool) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "Database connection not available.",
+          },
+        ],
+      };
+    }
+
     // Validate SQL
     if (!/^\s*select\b/i.test(params.sql)) {
       return {
@@ -37,7 +56,7 @@ export const dbQueryTool = {
       };
     }
 
-    const client = await pool.connect();
+    const client = await dbPool.connect();
     try {
       const res = await client.query(params.sql, params.params || []);
       const rows = res.rows ?? [];
