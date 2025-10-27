@@ -1,13 +1,18 @@
-import { z } from "zod";
-import type { ToolHandler } from "@modelcontextprotocol/sdk";
+export interface EchoToolParams {
+  message: string;
+}
 
-export const echoTool: ToolHandler = {
+export const echoTool = {
+  name: "echo",
   description: "Echo back a message",
-  inputSchema: z.object({
-    message: z.string().min(1),
-  }),
-  handler: async ({ message }: { message: string }) => {
-    return { text: message };
+  async execute(params: EchoToolParams) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: params.message,
+        },
+      ],
+    };
   },
 };
-
