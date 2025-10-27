@@ -13,7 +13,7 @@ export const dbQueryTool: ToolHandler = {
     sql: z.string().refine(s => /^\s*select\b/i.test(s), { message: "Only SELECT queries are allowed." }),
     params: z.array(z.union([z.string(), z.number(), z.boolean(), z.null()])).default([]),
   }),
-  handler: async ({ sql, params }) => {
+  handler: async ({ sql, params }: { sql: string; params: (string | number | boolean | null)[] }) => {
     if (!process.env.DATABASE_URL) {
       return { text: "DATABASE_URL not set." };
     }

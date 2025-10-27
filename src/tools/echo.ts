@@ -6,7 +6,7 @@ export const echoTool: ToolHandler = {
   inputSchema: z.object({
     message: z.string().min(1),
   }),
-  handler: async ({ message }) => {
+  handler: async ({ message }: { message: string }) => {
     return { text: message };
   },
 };
